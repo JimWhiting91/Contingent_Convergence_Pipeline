@@ -1,0 +1,36 @@
+initialize() {
+	// Constants are defined externally by a separate script
+	defineConstant("pop_size",pop_coef);
+	//defineConstant("mig_rate",migration_coef);
+	//defineConstant("bottleneck_prop", bottleneck_coef);
+	//defineConstant("finalsize_prop",finalsize_coef);
+	defineConstant("gene_id", ID_coef);
+	//defineConstant("run_id", run_coef);
+	defineConstant("optimum1", 0.0);
+	defineConstant("optimum2", 10.0);
+	defineConstant("sigma_C", 0.4);
+	defineConstant("sigma_K1", 1.0);
+	defineConstant("sigma_K2", selection_coef);
+  defineConstant("exon_l", EXON_L);
+
+	
+	initializeSLiMOptions(dimensionality="x");
+	initializeMutationRate(MUT_RATE);
+	
+	// 4 Different mutation types are defined: Neutral, General Deleterious, General Advantageous, Divergent Advantageous
+	initializeMutationType("m1", 0.5, "f", 0.0); // Neutral mutation
+	initializeMutationType("m4", 0.5, "n", 0.0, 1.0); // QTL SNPs
+	m4.convertToSubstitution = F;
+	
+	// Recombination
+	initializeRecombinationRate(1e-8); // Homogeneous mutation rate
+	
+	
+	// Genomic Elements are defined. Non-CDS have neutral m1, CDS have adaptive m2/m4 and deleterious m3
+	initializeGenomicElementType("g1", m1, 1.0); // Genomic Element 1 (INTRON) has m1 mutation rate
+	initializeGenomicElementType("g2", c(m1,m4), c(0.3, 0.7)); // Genomic Element 2 (CDS) has m3 del mutation rate and m2 adv mutation rate
+	
+	initializeInteractionType(1, "x", reciprocal=T, maxDistance=sigma_C * 3);     // competition
+	i1.setInteractionFunction("n", 1.0, sigma_C);
+	
+	initializeGenomicElement(g1, 0, 999); // g1 is non-coding Flank of 1000 bp
