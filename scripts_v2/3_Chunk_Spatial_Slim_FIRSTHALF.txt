@@ -1,0 +1,32 @@
+// Seed the new population
+
+1 {
+	sim.addSubpop("p1",pop_size); //               
+	p1.setSpatialBounds(c(-10.0, 10));
+  setSeed(gene_id);
+}
+
+// Set fitness
+
+1: late() {
+	// construct phenotypes from the additive effects of QTLs
+	inds = sim.subpopulations.individuals;
+	inds.x = inds.sumOfMutationsOfType(m4);
+	
+	// evaluate interactions
+	i1.evaluate();
+}
+
+// Set fitness up for p1
+fitness(m4,p1) {      // make QTLs intrinsically neutral
+	return 1.0;
+}
+fitness(NULL,p1) {    // reward proximity to the optimum
+	return 1.0 + dnorm(optimum1 - individual.x, mean=0.0, sd=sigma_K1);
+}
+fitness(NULL,p1) {    // phenotypic competition
+	totalStrength = sum(i1.strength(individual));
+	return 1.0 - totalStrength / p1.individualCount;
+}	
+
+10000 late() { p1.outputMSSample(2*pop_size,replace=F,filePath="./burned_gene.txt");}
