@@ -1,0 +1,486 @@
+1 late() {
+	sim.addSubpop("p1", pop_size);
+	
+	// READ MS FORMAT INITIAL STATE
+	lines = readFile("./burned_gene.txt");
+	index = 0;
+	
+	// skip lines until reaching the // line, then skip that line 
+	while (lines[index] != "//")
+		index = index + 1;
+	index = index + 1;
+	
+	
+	if (index + 2 + p1.individualCount * 2 > size(lines))
+		
+		stop("File is too short; terminating.");
+	
+	// next line should be segsites:
+	segsitesLine = lines[index];
+	index = index + 1;
+	parts = strsplit(segsitesLine);
+	if (size(parts) != 2) stop("Malformed segsites.");
+	if (parts[0] != "segsites:") stop("Missing segsites.");  segsites = asInteger(parts[1]);
+	
+	// and next is positions:
+	positionsLine = lines[index];
+	index = index + 1;
+	parts = strsplit(positionsLine);
+	if (size(parts) != segsites + 1) stop("Malformed positions.");
+	if (parts[0] != "positions:") stop("Missing positions.");
+	positions = asFloat(parts[1:(size(parts)-1)]);
+	
+	// create all mutations in a genome in a dummy subpopulation 
+	sim.addSubpop("p2", 1);
+	g = p2.genomes[0];
+	L = sim.chromosome.lastPosition;
+	intPositions = asInteger(round(positions * L));
+	muts = sapply(intPositions, "g.addNewMutation(m1, 0.0, applyValue);");
+	
+	// add the appropriate mutations to each genome
+	for (g in p1.genomes)
+	{
+		f = asLogical(asInteger(strsplit(lines[index], "")));
+		index = index + 1;
+		g.addMutations(muts[f]);
+	}
+	
+	// remove the dummy subpopulation 
+	p2.setSubpopulationSize(0);
+	
+	// Set initial FST and dXY to 0
+	sim.setValue("FST_1",0);
+	sim.setValue("FST_2",0);
+	sim.setValue("FST_3",0);
+	sim.setValue("FST_4",0);
+ 	sim.setValue("FST_5",0);
+	sim.setValue("FST_6",0);
+	sim.setValue("FST_7",0);
+	sim.setValue("FST_8",0);
+ 	sim.setValue("FST_9",0);
+	sim.setValue("FST_10",0);
+	sim.setValue("FST_11",0);
+	sim.setValue("FST_12",0);
+	
+	sim.setValue("dXY_1",0);
+	sim.setValue("dXY_2",0);
+	sim.setValue("dXY_3",0);
+	sim.setValue("dXY_4",0);
+ 	sim.setValue("dXY_5",0);
+	sim.setValue("dXY_6",0);
+	sim.setValue("dXY_7",0);
+	sim.setValue("dXY_8",0);
+ 	sim.setValue("dXY_9",0);
+	sim.setValue("dXY_10",0);
+	sim.setValue("dXY_11",0);
+	sim.setValue("dXY_12",0);
+	
+	sim.setValue("Pop1_Pi_1",0);
+	sim.setValue("Pop1_Pi_2",0);
+	sim.setValue("Pop1_Pi_3",0);
+	sim.setValue("Pop1_Pi_4",0);
+ 	sim.setValue("Pop1_Pi_5",0);
+	sim.setValue("Pop1_Pi_6",0);
+	sim.setValue("Pop1_Pi_7",0);
+	sim.setValue("Pop1_Pi_8",0);
+ 	sim.setValue("Pop1_Pi_9",0);
+	sim.setValue("Pop1_Pi_10",0);
+	sim.setValue("Pop1_Pi_11",0);
+	sim.setValue("Pop1_Pi_12",0);
+	
+	sim.setValue("Pop2_Pi_1",0);
+	sim.setValue("Pop2_Pi_2",0);
+	sim.setValue("Pop2_Pi_3",0);
+	sim.setValue("Pop2_Pi_4",0);
+ 	sim.setValue("Pop2_Pi_5",0);
+	sim.setValue("Pop2_Pi_6",0);
+	sim.setValue("Pop2_Pi_7",0);
+	sim.setValue("Pop2_Pi_8",0);
+ 	sim.setValue("Pop2_Pi_9",0);
+	sim.setValue("Pop2_Pi_10",0);
+	sim.setValue("Pop2_Pi_11",0);
+	sim.setValue("Pop2_Pi_12",0);
+	
+	sim.setValue("mean1_1",0);
+	sim.setValue("mean1_2",0);
+	sim.setValue("mean1_3",0);
+	sim.setValue("mean1_4",0);
+ 	sim.setValue("mean1_5",0);
+	sim.setValue("mean1_6",0);
+	sim.setValue("mean1_7",0);
+	sim.setValue("mean1_8",0);
+ 	sim.setValue("mean1_9",0);
+	sim.setValue("mean1_10",0);
+	sim.setValue("mean1_11",0);
+	sim.setValue("mean1_12",0);
+	
+	sim.setValue("mean2_1",0);
+	sim.setValue("mean2_2",0);
+	sim.setValue("mean2_3",0);
+	sim.setValue("mean2_4",0);
+ 	sim.setValue("mean2_5",0);
+	sim.setValue("mean2_6",0);
+	sim.setValue("mean2_7",0);
+	sim.setValue("mean2_8",0);
+  sim.setValue("mean2_9",0);
+	sim.setValue("mean2_10",0);
+	sim.setValue("mean2_11",0);
+	sim.setValue("mean2_12",0);
+	
+	sim.setValue("sd1_1",0);
+	sim.setValue("sd1_2",0);
+	sim.setValue("sd1_3",0);
+	sim.setValue("sd1_4",0);
+ 	sim.setValue("sd1_5",0);
+	sim.setValue("sd1_6",0);
+	sim.setValue("sd1_7",0);
+	sim.setValue("sd1_8",0);
+ 	sim.setValue("sd1_9",0);
+	sim.setValue("sd1_10",0);
+	sim.setValue("sd1_11",0);
+	sim.setValue("sd1_12",0);
+	
+	sim.setValue("sd2_1",0);
+	sim.setValue("sd2_2",0);
+	sim.setValue("sd2_3",0);
+	sim.setValue("sd2_4",0);
+ 	sim.setValue("sd2_5",0);
+	sim.setValue("sd2_6",0);
+	sim.setValue("sd2_7",0);
+	sim.setValue("sd2_8",0);
+ 	sim.setValue("sd2_9",0);
+	sim.setValue("sd2_10",0);
+	sim.setValue("sd2_11",0);
+	sim.setValue("sd2_12",0);
+	
+	sim.setValue("evolv_gen",0);
+ 
+//  setSeed(iteration);
+
+}
+
+// Seed the new population
+
+1 late()  {
+	sim.addSubpopSplit("p2",asInteger(bottleneck_prop),p1); //               
+	p1.setSpatialBounds(c(-10.0, (optimum2+10)));
+	p2.setSpatialBounds(c(-10.0, (optimum2+10)));
+	
+	 // The population grows to carrying capacity
+pop_size_bot2=asInteger(pop_size*finalsize_prop); // 10% recovery size of original pop
+p2.setSubpopulationSize(pop_size_bot2);
+ 
+    // And we either have or do not have migration
+p2.setMigrationRates(c(p1), c(mig_rate));
+p1.setMigrationRates(c(p2), c(mig_rate));
+
+}
+
+1: late() {
+	// construct phenotypes from the additive effects of QTLs
+	inds = sim.subpopulations.individuals;
+	inds.x = inds.sumOfMutationsOfType(m4);
+	
+	// evaluate interactions
+	i1.evaluate();
+}
+
+// Set fitness up for p1
+fitness(m4,p1) {      // make QTLs intrinsically neutral
+	return 1.0;
+}
+fitness(NULL,p1) {    // reward proximity to the optimum
+	return 1.0 + dnorm(optimum1 - individual.x, mean=0.0, sd=sigma_K1);
+}
+fitness(NULL,p1) {    // phenotypic competition
+	totalStrength = sum(i1.strength(individual));
+	return 1.0 - totalStrength / p1.individualCount;
+}
+
+fitness(m4,p2) {      // make QTLs intrinsically neutral
+	return 1.0;
+}
+fitness(NULL,p2) {    // reward proximity to the optimum
+	return 1.0 + dnorm(optimum2 - individual.x, mean=0.0, sd=sigma_K2);
+}
+fitness(NULL,p2) {    // phenotypic competition
+	totalStrength2 = sum(i1.strength(individual));
+	return 1.0 - totalStrength2 / p2.individualCount;
+}
+
+// NOW WE CALCULATE AT FST/DXY AT 12 STAGES AVERAGED OVE THE GENERATION OF INTEREST AND THE PRECEDING 50
+ 
+80:100 {
+sim.setValue("FST_1", (sim.getValue("FST_1") + calcFST(p2, p1))); 
+sim.setValue("dXY_1", (sim.getValue("dXY_1") + calcDXY(p2, p1)));
+sim.setValue("Pop1_Pi_1", (sim.getValue("Pop1_Pi_1") + calcPI(p1))); 
+sim.setValue("Pop2_Pi_1", (sim.getValue("Pop2_Pi_1") + calcPI(p2))); 
+sim.setValue("mean1_1", (sim.getValue("mean1_1") + calcPhenoM(p1))); 
+sim.setValue("mean2_1", (sim.getValue("mean2_1") + calcPhenoM(p2))); 
+sim.setValue("sd1_1", (sim.getValue("sd1_1") + calcPhenoSD(p1))); 
+sim.setValue("sd2_1", (sim.getValue("sd2_1") + calcPhenoSD(p2)));  
+}
+100 {
+sim.setValue("FST_1",(sim.getValue("FST_1")/20));
+sim.setValue("dXY_1",(sim.getValue("dXY_1")/20));
+sim.setValue("Pop1_Pi_1", (sim.getValue("Pop1_Pi_1")/20)); 
+sim.setValue("Pop2_Pi_1", (sim.getValue("Pop2_Pi_1")/20)); 
+sim.setValue("mean1_1", (sim.getValue("mean1_1")/20)); 
+sim.setValue("mean2_1", (sim.getValue("mean2_1")/20)); 
+sim.setValue("sd1_1", (sim.getValue("sd1_1")/20)); 
+sim.setValue("sd2_1", (sim.getValue("sd2_1")/20)); 
+}
+480:500 {
+sim.setValue("FST_2", (sim.getValue("FST_2") + calcFST(p2, p1))); 
+sim.setValue("dXY_2", (sim.getValue("dXY_2") + calcDXY(p2, p1))); 
+sim.setValue("Pop1_Pi_2", (sim.getValue("Pop1_Pi_2") + calcPI(p1))); 
+sim.setValue("Pop2_Pi_2", (sim.getValue("Pop2_Pi_2") + calcPI(p2))); 
+sim.setValue("mean1_2", (sim.getValue("mean1_2") + calcPhenoM(p1))); 
+sim.setValue("mean2_2", (sim.getValue("mean2_2") + calcPhenoM(p2))); 
+sim.setValue("sd1_2", (sim.getValue("sd1_2") + calcPhenoSD(p1))); 
+sim.setValue("sd2_2", (sim.getValue("sd2_2") + calcPhenoSD(p2))); 
+}
+500 {
+sim.setValue("FST_2",(sim.getValue("FST_2")/20));
+sim.setValue("dXY_2",(sim.getValue("dXY_2")/20));
+sim.setValue("Pop1_Pi_2", (sim.getValue("Pop1_Pi_2")/20)); 
+sim.setValue("Pop2_Pi_2", (sim.getValue("Pop2_Pi_2")/20));
+sim.setValue("mean1_2", (sim.getValue("mean1_2")/20)); 
+sim.setValue("mean2_2", (sim.getValue("mean2_2")/20)); 
+sim.setValue("sd1_2", (sim.getValue("sd1_2")/20)); 
+sim.setValue("sd2_2", (sim.getValue("sd2_2")/20)); 
+}
+980:1000 {
+sim.setValue("FST_3", (sim.getValue("FST_3") + calcFST(p2, p1))); 
+sim.setValue("dXY_3", (sim.getValue("dXY_3") + calcDXY(p2, p1))); 
+sim.setValue("Pop1_Pi_3", (sim.getValue("Pop1_Pi_3") + calcPI(p1))); 
+sim.setValue("Pop2_Pi_3", (sim.getValue("Pop2_Pi_3") + calcPI(p2)));
+sim.setValue("mean1_3", (sim.getValue("mean1_3") + calcPhenoM(p1))); 
+sim.setValue("mean2_3", (sim.getValue("mean2_3") + calcPhenoM(p2))); 
+sim.setValue("sd1_3", (sim.getValue("sd1_3") + calcPhenoSD(p1))); 
+sim.setValue("sd2_3", (sim.getValue("sd2_3") + calcPhenoSD(p2)));  
+}
+1000 {
+sim.setValue("FST_3",(sim.getValue("FST_3")/20));
+sim.setValue("dXY_3",(sim.getValue("dXY_3")/20));
+sim.setValue("Pop1_Pi_3", (sim.getValue("Pop1_Pi_3")/20)); 
+sim.setValue("Pop2_Pi_3", (sim.getValue("Pop2_Pi_3")/20));
+sim.setValue("mean1_3", (sim.getValue("mean1_3")/20)); 
+sim.setValue("mean2_3", (sim.getValue("mean2_3")/20)); 
+sim.setValue("sd1_3", (sim.getValue("sd1_3")/20)); 
+sim.setValue("sd2_3", (sim.getValue("sd2_3")/20)); 
+}
+1980:2000 {
+sim.setValue("FST_4", (sim.getValue("FST_4") + calcFST(p2, p1))); 
+sim.setValue("dXY_4", (sim.getValue("dXY_4") + calcDXY(p2, p1))); 
+sim.setValue("Pop1_Pi_4", (sim.getValue("Pop1_Pi_4") + calcPI(p1))); 
+sim.setValue("Pop2_Pi_4", (sim.getValue("Pop2_Pi_4") + calcPI(p2)));
+sim.setValue("mean1_4", (sim.getValue("mean1_4") + calcPhenoM(p1))); 
+sim.setValue("mean2_4", (sim.getValue("mean2_4") + calcPhenoM(p2))); 
+sim.setValue("sd1_4", (sim.getValue("sd1_4") + calcPhenoSD(p1))); 
+sim.setValue("sd2_4", (sim.getValue("sd2_4") + calcPhenoSD(p2)));   
+}
+2000 {
+sim.setValue("FST_4",(sim.getValue("FST_4")/20));
+sim.setValue("dXY_4",(sim.getValue("dXY_4")/20));
+sim.setValue("Pop1_Pi_4", (sim.getValue("Pop1_Pi_4")/20)); 
+sim.setValue("Pop2_Pi_4", (sim.getValue("Pop2_Pi_4")/20));
+sim.setValue("mean1_4", (sim.getValue("mean1_4")/20)); 
+sim.setValue("mean2_4", (sim.getValue("mean2_4")/20)); 
+sim.setValue("sd1_4", (sim.getValue("sd1_4")/20)); 
+sim.setValue("sd2_4", (sim.getValue("sd2_4")/20)); 
+}
+
+2980:3000 {
+sim.setValue("FST_5", (sim.getValue("FST_5") + calcFST(p2, p1))); 
+sim.setValue("dXY_5", (sim.getValue("dXY_5") + calcDXY(p2, p1))); 
+sim.setValue("Pop1_Pi_5", (sim.getValue("Pop1_Pi_5") + calcPI(p1))); 
+sim.setValue("Pop2_Pi_5", (sim.getValue("Pop2_Pi_5") + calcPI(p2)));
+sim.setValue("mean1_5", (sim.getValue("mean1_5") + calcPhenoM(p1))); 
+sim.setValue("mean2_5", (sim.getValue("mean2_5") + calcPhenoM(p2))); 
+sim.setValue("sd1_5", (sim.getValue("sd1_5") + calcPhenoSD(p1))); 
+sim.setValue("sd2_5", (sim.getValue("sd2_5") + calcPhenoSD(p2)));   
+}
+3000 {
+sim.setValue("FST_5",(sim.getValue("FST_5")/20));
+sim.setValue("dXY_5",(sim.getValue("dXY_5")/20));
+sim.setValue("Pop1_Pi_5", (sim.getValue("Pop1_Pi_5")/20)); 
+sim.setValue("Pop2_Pi_5", (sim.getValue("Pop2_Pi_5")/20));
+sim.setValue("mean1_5", (sim.getValue("mean1_5")/20)); 
+sim.setValue("mean2_5", (sim.getValue("mean2_5")/20)); 
+sim.setValue("sd1_5", (sim.getValue("sd1_5")/20)); 
+sim.setValue("sd2_5", (sim.getValue("sd2_5")/20)); 
+}
+
+3980:4000 {
+sim.setValue("FST_6", (sim.getValue("FST_6") + calcFST(p2, p1))); 
+sim.setValue("dXY_6", (sim.getValue("dXY_6") + calcDXY(p2, p1))); 
+sim.setValue("Pop1_Pi_6", (sim.getValue("Pop1_Pi_6") + calcPI(p1))); 
+sim.setValue("Pop2_Pi_6", (sim.getValue("Pop2_Pi_6") + calcPI(p2)));
+sim.setValue("mean1_6", (sim.getValue("mean1_6") + calcPhenoM(p1))); 
+sim.setValue("mean2_6", (sim.getValue("mean2_6") + calcPhenoM(p2))); 
+sim.setValue("sd1_6", (sim.getValue("sd1_6") + calcPhenoSD(p1))); 
+sim.setValue("sd2_6", (sim.getValue("sd2_6") + calcPhenoSD(p2)));   
+}
+4000 {
+sim.setValue("FST_6",(sim.getValue("FST_6")/20));
+sim.setValue("dXY_6",(sim.getValue("dXY_6")/20));
+sim.setValue("Pop1_Pi_6", (sim.getValue("Pop1_Pi_6")/20)); 
+sim.setValue("Pop2_Pi_6", (sim.getValue("Pop2_Pi_6")/20));
+sim.setValue("mean1_6", (sim.getValue("mean1_6")/20)); 
+sim.setValue("mean2_6", (sim.getValue("mean2_6")/20)); 
+sim.setValue("sd1_6", (sim.getValue("sd1_6")/20)); 
+sim.setValue("sd2_6", (sim.getValue("sd2_6")/20)); 
+}
+
+4980:5000 {
+sim.setValue("FST_7", (sim.getValue("FST_7") + calcFST(p2, p1))); 
+sim.setValue("dXY_7", (sim.getValue("dXY_7") + calcDXY(p2, p1))); 
+sim.setValue("Pop1_Pi_7", (sim.getValue("Pop1_Pi_7") + calcPI(p1))); 
+sim.setValue("Pop2_Pi_7", (sim.getValue("Pop2_Pi_7") + calcPI(p2)));
+sim.setValue("mean1_7", (sim.getValue("mean1_7") + calcPhenoM(p1))); 
+sim.setValue("mean2_7", (sim.getValue("mean2_7") + calcPhenoM(p2))); 
+sim.setValue("sd1_7", (sim.getValue("sd1_7") + calcPhenoSD(p1))); 
+sim.setValue("sd2_7", (sim.getValue("sd2_7") + calcPhenoSD(p2)));   
+}
+5000 {
+sim.setValue("FST_7",(sim.getValue("FST_7")/20));
+sim.setValue("dXY_7",(sim.getValue("dXY_7")/20));
+sim.setValue("Pop1_Pi_7", (sim.getValue("Pop1_Pi_7")/20)); 
+sim.setValue("Pop2_Pi_7", (sim.getValue("Pop2_Pi_7")/20));
+sim.setValue("mean1_7", (sim.getValue("mean1_7")/20)); 
+sim.setValue("mean2_7", (sim.getValue("mean2_7")/20)); 
+sim.setValue("sd1_7", (sim.getValue("sd1_7")/20)); 
+sim.setValue("sd2_7", (sim.getValue("sd2_7")/20)); 
+}
+
+5980:6000 {
+sim.setValue("FST_8", (sim.getValue("FST_8") + calcFST(p2, p1))); 
+sim.setValue("dXY_8", (sim.getValue("dXY_8") + calcDXY(p2, p1))); 
+sim.setValue("Pop1_Pi_8", (sim.getValue("Pop1_Pi_8") + calcPI(p1))); 
+sim.setValue("Pop2_Pi_8", (sim.getValue("Pop2_Pi_8") + calcPI(p2)));
+sim.setValue("mean1_8", (sim.getValue("mean1_8") + calcPhenoM(p1))); 
+sim.setValue("mean2_8", (sim.getValue("mean2_8") + calcPhenoM(p2))); 
+sim.setValue("sd1_8", (sim.getValue("sd1_8") + calcPhenoSD(p1))); 
+sim.setValue("sd2_8", (sim.getValue("sd2_8") + calcPhenoSD(p2)));   
+}
+6000 {
+sim.setValue("FST_8",(sim.getValue("FST_8")/20));
+sim.setValue("dXY_8",(sim.getValue("dXY_8")/20));
+sim.setValue("Pop1_Pi_8", (sim.getValue("Pop1_Pi_8")/20)); 
+sim.setValue("Pop2_Pi_8", (sim.getValue("Pop2_Pi_8")/20));
+sim.setValue("mean1_8", (sim.getValue("mean1_8")/20)); 
+sim.setValue("mean2_8", (sim.getValue("mean2_8")/20)); 
+sim.setValue("sd1_8", (sim.getValue("sd1_8")/20)); 
+sim.setValue("sd2_8", (sim.getValue("sd2_8")/20)); 
+}
+
+6980:7000 {
+sim.setValue("FST_9", (sim.getValue("FST_9") + calcFST(p2, p1))); 
+sim.setValue("dXY_9", (sim.getValue("dXY_9") + calcDXY(p2, p1))); 
+sim.setValue("Pop1_Pi_9", (sim.getValue("Pop1_Pi_9") + calcPI(p1))); 
+sim.setValue("Pop2_Pi_9", (sim.getValue("Pop2_Pi_9") + calcPI(p2)));
+sim.setValue("mean1_9", (sim.getValue("mean1_9") + calcPhenoM(p1))); 
+sim.setValue("mean2_9", (sim.getValue("mean2_9") + calcPhenoM(p2))); 
+sim.setValue("sd1_9", (sim.getValue("sd1_9") + calcPhenoSD(p1))); 
+sim.setValue("sd2_9", (sim.getValue("sd2_9") + calcPhenoSD(p2)));   
+}
+7000 {
+sim.setValue("FST_9",(sim.getValue("FST_9")/20));
+sim.setValue("dXY_9",(sim.getValue("dXY_9")/20));
+sim.setValue("Pop1_Pi_9", (sim.getValue("Pop1_Pi_9")/20)); 
+sim.setValue("Pop2_Pi_9", (sim.getValue("Pop2_Pi_9")/20));
+sim.setValue("mean1_9", (sim.getValue("mean1_9")/20)); 
+sim.setValue("mean2_9", (sim.getValue("mean2_9")/20)); 
+sim.setValue("sd1_9", (sim.getValue("sd1_9")/20)); 
+sim.setValue("sd2_9", (sim.getValue("sd2_9")/20)); 
+}
+
+7980:8000 {
+sim.setValue("FST_10", (sim.getValue("FST_10") + calcFST(p2, p1))); 
+sim.setValue("dXY_10", (sim.getValue("dXY_10") + calcDXY(p2, p1))); 
+sim.setValue("Pop1_Pi_10", (sim.getValue("Pop1_Pi_10") + calcPI(p1))); 
+sim.setValue("Pop2_Pi_10", (sim.getValue("Pop2_Pi_10") + calcPI(p2)));
+sim.setValue("mean1_10", (sim.getValue("mean1_10") + calcPhenoM(p1))); 
+sim.setValue("mean2_10", (sim.getValue("mean2_10") + calcPhenoM(p2))); 
+sim.setValue("sd1_10", (sim.getValue("sd1_10") + calcPhenoSD(p1))); 
+sim.setValue("sd2_10", (sim.getValue("sd2_10") + calcPhenoSD(p2)));   
+}
+8000 {
+sim.setValue("FST_10",(sim.getValue("FST_10")/20));
+sim.setValue("dXY_10",(sim.getValue("dXY_10")/20));
+sim.setValue("Pop1_Pi_10", (sim.getValue("Pop1_Pi_10")/20)); 
+sim.setValue("Pop2_Pi_10", (sim.getValue("Pop2_Pi_10")/20));
+sim.setValue("mean1_10", (sim.getValue("mean1_10")/20)); 
+sim.setValue("mean2_10", (sim.getValue("mean2_10")/20)); 
+sim.setValue("sd1_10", (sim.getValue("sd1_10")/20)); 
+sim.setValue("sd2_10", (sim.getValue("sd2_10")/20)); 
+}
+
+8980:9000 {
+sim.setValue("FST_11", (sim.getValue("FST_11") + calcFST(p2, p1))); 
+sim.setValue("dXY_11", (sim.getValue("dXY_11") + calcDXY(p2, p1))); 
+sim.setValue("Pop1_Pi_11", (sim.getValue("Pop1_Pi_11") + calcPI(p1))); 
+sim.setValue("Pop2_Pi_11", (sim.getValue("Pop2_Pi_11") + calcPI(p2)));
+sim.setValue("mean1_11", (sim.getValue("mean1_11") + calcPhenoM(p1))); 
+sim.setValue("mean2_11", (sim.getValue("mean2_11") + calcPhenoM(p2))); 
+sim.setValue("sd1_11", (sim.getValue("sd1_11") + calcPhenoSD(p1))); 
+sim.setValue("sd2_11", (sim.getValue("sd2_11") + calcPhenoSD(p2)));   
+}
+9000 {
+sim.setValue("FST_11",(sim.getValue("FST_11")/20));
+sim.setValue("dXY_11",(sim.getValue("dXY_11")/20));
+sim.setValue("Pop1_Pi_11", (sim.getValue("Pop1_Pi_11")/20)); 
+sim.setValue("Pop2_Pi_11", (sim.getValue("Pop2_Pi_11")/20));
+sim.setValue("mean1_11", (sim.getValue("mean1_11")/20)); 
+sim.setValue("mean2_11", (sim.getValue("mean2_11")/20)); 
+sim.setValue("sd1_11", (sim.getValue("sd1_11")/20)); 
+sim.setValue("sd2_11", (sim.getValue("sd2_11")/20)); 
+}
+
+9980:10000 {
+sim.setValue("FST_12", (sim.getValue("FST_12") + calcFST(p2, p1))); 
+sim.setValue("dXY_12", (sim.getValue("dXY_12") + calcDXY(p2, p1))); 
+sim.setValue("Pop1_Pi_12", (sim.getValue("Pop1_Pi_12") + calcPI(p1))); 
+sim.setValue("Pop2_Pi_12", (sim.getValue("Pop2_Pi_12") + calcPI(p2)));
+sim.setValue("mean1_12", (sim.getValue("mean1_12") + calcPhenoM(p1))); 
+sim.setValue("mean2_12", (sim.getValue("mean2_12") + calcPhenoM(p2))); 
+sim.setValue("sd1_12", (sim.getValue("sd1_12") + calcPhenoSD(p1))); 
+sim.setValue("sd2_12", (sim.getValue("sd2_12") + calcPhenoSD(p2)));   
+}
+10000 {
+sim.setValue("FST_12",(sim.getValue("FST_12")/20));
+sim.setValue("dXY_12",(sim.getValue("dXY_12")/20));
+sim.setValue("Pop1_Pi_12", (sim.getValue("Pop1_Pi_12")/20)); 
+sim.setValue("Pop2_Pi_12", (sim.getValue("Pop2_Pi_12")/20));
+sim.setValue("mean1_12", (sim.getValue("mean1_12")/20)); 
+sim.setValue("mean2_12", (sim.getValue("mean2_12")/20)); 
+sim.setValue("sd1_12", (sim.getValue("sd1_12")/20)); 
+sim.setValue("sd2_12", (sim.getValue("sd2_12")/20)); 
+}
+
+
+2:10000 late() {
+	if (sim.getValue("evolv_gen")==0)
+	{
+pheno_mean = mean(p2.individuals.x);
+pheno_sd = sd(p2.individuals.x);
+
+	if (pheno_mean > (optimum2-1))
+	{
+	sim.setValue("evolv_gen",sim.generation);
+	}
+}
+}
+
+10000: late() {
+// Write an output file for the results to the command line
+ 
+lines =NULL;
+for (i in 1:12) { lines_out = paste(c(gene_id,'\t',iteration,'\t',run_id,'\t',sigma_K2,'\t',bottleneck_prop,'\t',finalsize_prop,'\t',mig_rate,'\t',siteN,'\t',paste(c("Gen_",i),""),'\t',sim.getValue(paste(c("FST_",i),"")),'\t',sim.getValue(paste(c("dXY_",i),"")),'\t',sim.getValue(paste(c("Pop1_Pi_",i),"")),'\t',sim.getValue(paste(c("Pop2_Pi_",i),"")),'\t',sim.getValue(paste(c("mean1_",i),"")),'\t',sim.getValue(paste(c("sd1_",i),"")),'\t',sim.getValue(paste(c("mean2_",i),"")),'\t',sim.getValue(paste(c("sd2_",i),"")),'\t',sim.getValue("evolv_gen"),'\n'),'');
+lines = c(lines, lines_out);  }
+ 
+// Output results alongside selection coefficient
+file = paste(lines,"");
+writeFile(paste(c("GENE_",gene_id,"_TREATMENT_",run_id,"_ITER_",iteration,".txt"),''),file);
+}
