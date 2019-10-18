@@ -2,12 +2,6 @@
 # This script takes the output files from slim (1 per gene window, 20 iterations per 16 treatments per 12 sampling points) and analyses
 
 # Modified to only look at PhenoNULL
-
-# STEP 1 - Correlations
-# STEP 2 - Distributions
-# STEP 3 - FPR/FNR
-# STEP 4 - LMM of measures
-
 ##########
 
 # Packages
