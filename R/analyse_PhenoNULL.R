@@ -1,13 +1,17 @@
-##########
+ ##########
 # This script takes the output files from slim (1 per gene window, 20 iterations per 16 treatments per 12 sampling points) and analyses
-# SPECIFICALLY THIS SCRIPT REPLACES THE PHENOdiv DATA WITH PHENOnull AND REPEATS ALL MAJOR ANALYSES
-# STEP 1 - Correlations
 
-# Data = Spatial model, fixed DXY, fixed evolv_gen
+# Modified to only look at PhenoNULL
+
+# STEP 1 - Correlations
+# STEP 2 - Distributions
+# STEP 3 - FPR/FNR
+# STEP 4 - LMM of measures
+
 ##########
 
 # Packages
-lib=c("ggedit","tidyr","dplyr","pbapply","randomForest","VennDiagram","ghibli","ggpubr","data.table","ggplot2","parallel","doParallel","effects","knitr","lme4","MASS","lmerTest","dplyr","rpart","randomForest")
+lib=c("ggedit","tidyr","dplyr","pbapply","randomForest","VennDiagram","ghibli","ggpubr","data.table","ggplot2","parallel","doParallel","effects","knitr","lme4","MASS","lmerTest","dplyr","rpart","randomForest","MuMIn")
 lapply(lib,library,character.only=T)
 
 # Source functions
