@@ -4,6 +4,8 @@
 # Parameters are entered at the top of scripts
 # Designed to be run over an HPC, with $MOAB_JOBARRAYINDEX corresponding to array variable. Can be replaced with forloop or similar although this would take substantially longer.
 
+# This script performs simulations with both diverged (PhenoDiv) and common (PhenoNull) phenotypic optima.
+
 #---------------------------
 
 # Set environment
