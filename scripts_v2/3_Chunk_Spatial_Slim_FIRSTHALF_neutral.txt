@@ -1,0 +1,9 @@
+// Seed the new population
+
+1 {
+	sim.addSubpop("p1",pop_size); //               
+  setSeed(gene_id);
+}
+
+// Run
+10000 late() { p1.outputMSSample(2*pop_size,replace=F,filePath="./burned_gene.txt");}
