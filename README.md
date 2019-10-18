@@ -1,4 +1,4 @@
-# Contingent Convergence Pipeline
+# Contingent Convergence Pipeline - Scripts accompanying Whiting and Fraser, 2019 - *Contingent Convergence: The ability to detect convergent genomic evolution is dependent on population size and migration*
 Full pipeline employing SLiM to investigate the effects of variable demographic parameters on genetic measures of population differentiation in adaptation and convergence
 
 ## Issues
