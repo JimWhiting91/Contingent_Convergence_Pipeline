@@ -1,0 +1,156 @@
+// Calculate the FST between two subpopulations
+function (f$)calcFST(o<Subpopulation>$ subpop1, o<Subpopulation>$ subpop2)
+{
+	p1_p = sim.mutationFrequencies(subpop1);
+	p2_p = sim.mutationFrequencies(subpop2);
+	mean_p = (p1_p + p2_p) / 2.0;
+	H_t = 2.0 * mean_p * (1.0 - mean_p);
+	H_s = p1_p * (1.0 - p1_p) + p2_p * (1.0 - p2_p);
+	fst = 1.0 - H_s/H_t;
+	
+	fst = fst[!isNAN(fst)];  // exclude muts where mean_p is 0.0 or 1.0
+	
+	return mean(fst);
+}
+
+
+// Calculate the dXY between two subpopulations
+function (f$)calcDXY(o<Subpopulation>$ subpop1, o<Subpopulation>$ subpop2)
+{
+
+// Where are mutations?
+mut_pos = sim.mutations.position;
+
+// Make a matrix to store everything in
+freqs_M = matrix(c(mut_pos,
+sim.mutationFrequencies(subpop1),
+sim.mutationFrequencies(subpop2)),nrow=length(mut_pos),ncol=3);
+
+freqs_M = freqs_M[order(freqs_M[,0]),]; // order by genomic location
+
+// Make a vector to fill with allele frequency sums
+sum_freqs_out = rep(99.0,length(freqs_M[,0]));
+
+// Loop over the matrix and return the reference allele freq, starting from second row
+Last_N=length(freqs_M[,0])-1;
+for (i in 0:Last_N)
+{
+// First identify the indices that match genomic position
+pos = asInteger(freqs_M[i,0]);
+pos_index = which(freqs_M[,0]==pos[0]);
+
+// Define vectors to store frequencies + 1 for the reference
+pop1_vec = float(length(pos_index)+1);
+pop2_vec = float(length(pos_index)+1);
+
+// Fill the vectors
+for (j in 0:(length(pos_index)-1))
+{
+pop1_vec[j] = freqs_M[pos_index[j],1][0];
+pop2_vec[j] = freqs_M[pos_index[j],2][0];
+}
+
+// Add the reference allele freq
+pop1_vec[length(pos_index)] = 1 - sum(pop1_vec);
+pop2_vec[length(pos_index)] = 1 - sum(pop2_vec);
+
+// Get sum of product of allele freqs
+freq_productsum = sum(pop1_vec * pop2_vec);
+
+// Return to output vector at the site of the unique genome pos so multi-allelic SNPs overwrite
+sum_freqs_out[min(pos_index)] = freq_productsum;
+}
+
+// Prune out multiallele values
+sum_freqs_out_pruned = sum_freqs_out[sum_freqs_out != 99];
+
+// Final calculation of sum of all probabilities of not finding same allele averaged over length of genome
+dxy=(sum(1-sum_freqs_out_pruned))/siteN;
+
+return dxy;
+}
+
+
+
+// Calculate mean nucleotide heterozygosity across the population
+
+function(f$)calcPI(o<Subpopulation>$ subpop)
+{
+	total = 0.0;
+	for (ind in subpop.individuals)
+	{
+		
+		// Calculate the nucleotide heterozygosity of this individual 
+		
+		muts0 = ind.genomes[0].mutations;
+		muts1 = ind.genomes[1].mutations;
+		
+		// Count the shared mutations
+		shared_count = sum(match(muts0, muts1) >= 0);
+		
+		// All remaining mutations are unshared (i.e. heterozygous) 
+		unshared_count = muts0.size() + muts1.size() - 2 * shared_count;
+		
+		// pi is the mean heterozygosity across the chromosome
+		pi_ind = unshared_count / (sim.chromosome.lastPosition + 1);
+		total = total + pi_ind;
+	}
+	
+	pi = total / subpop.individuals.size();
+	
+	return pi;
+}
+
+// Calc mean
+function(f$)calcPhenoM(o<Subpopulation>$ subpop)
+{
+tags = subpop.individuals.x;
+avg = mean(tags);
+return avg;
+}
+
+// Calc sd
+function(f$)calcPhenoSD(o<Subpopulation>$ subpop)
+{
+tags = subpop.individuals.x;
+standarddev = sd(tags);
+return standarddev;
+}
+
+
+
+initialize() {
+	// Constants are defined externally by a separate script
+	defineConstant("pop_size",pop_coef);
+	defineConstant("mig_rate",migration_coef);
+	defineConstant("bottleneck_prop", bottleneck_coef);
+	defineConstant("finalsize_prop",finalsize_coef);
+	defineConstant("gene_id", ID_coef);
+	defineConstant("run_id", run_coef);
+	defineConstant("iteration", ITERATION_N);
+	defineConstant("optimum1", 0.0);
+	defineConstant("optimum2", 0.0);
+	defineConstant("sigma_C", 0.4);
+	defineConstant("sigma_K1", 1.0);
+	defineConstant("sigma_K2", 10^selection_coef);
+ defineConstant("exon_l", EXON_L);
+
+	
+	initializeSLiMOptions(dimensionality="x");
+	initializeMutationRate(MUT_RATE);
+	
+	// 4 Different mutation types are defined: Neutral, General Deleterious, General Advantageous, Divergent Advantageous
+	initializeMutationType("m1", 0.5, "f", 0.0); // Neutral mutation
+	initializeMutationType("m4", 0.5, "n", 0.0, 1.0); // QTL SNPs
+	m4.convertToSubstitution = F;
+	
+	// Recombination
+	initializeRecombinationRate(1e-8); // Homogeneous mutation rate
+	
+	
+	// Genomic Elements are defined. Non-CDS have neutral m1, CDS have adaptive m2/m4 and deleterious m3
+	initializeGenomicElementType("g1", m1, 1.0); // Genomic Element 1 (INTRON) has m1 mutation rate
+	initializeGenomicElementType("g2", c(m1,m4), c(0.3, 0.7)); // Genomic Element 2 (CDS) has m3 del mutation rate and m2 adv mutation rate
+	
+	initializeInteractionType(1, "x", reciprocal=T, maxDistance=sigma_C * 3);     // competition
+	i1.setInteractionFunction("n", 1.0, sigma_C);
