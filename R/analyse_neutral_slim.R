@@ -1,9 +1,7 @@
-##########
+ ##########
 # This script takes the output files from slim (1 per gene window, 20 iterations per 16 treatments per 12 sampling points) and analyses
-# SPECIFICALLY THIS SCRIPT REPLACES THE PHENOdiv DATA WITH NEUTRAL AND REPEATS ALL MAJOR ANALYSES
-# STEP 1 - Correlations
 
-# Data = Spatial model, fixed DXY, fixed evolv_gen
+# Modified to only look at Neutral Data
 ##########
 
 # Packages
