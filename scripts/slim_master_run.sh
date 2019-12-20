@@ -8,10 +8,6 @@
 
 #---------------------------
 
-# Set environment
-module load GCC/8.1.0-2.30
-module load Perl/5.26.1-foss-2018a
-
 # Set up working directory
 MASTER=~/slim_dir
 
@@ -19,8 +15,9 @@ MASTER=~/slim_dir
 # Size of Pop and mutation rate
 POP_N=1000
 MUTATION="4.89e-6"
-MUT_EFFECT=1.0
-OUT_DIR="MutRate-6"
+REC_RATE="1e-6"
+MUT_EFFECT=1
+OUT_DIR="BASIC_OUTPUT"
 SLIM_LIBRARY=$MASTER/outputs/slim_genes
 
 # Make output folder if it does not already exist
@@ -39,6 +36,7 @@ sed "s/selection_coef/${SEL_COEF}/g" $MASTER/scripts/1_Chunk_Spatial_Slim.txt > 
 sed -i "s/pop_coef/${POP_N}/g" 1_Chunk_Slim_mod_demographics_${MOAB_JOBARRAYINDEX}
 sed -i "s/ID_coef/${MOAB_JOBARRAYINDEX}/g" 1_Chunk_Slim_mod_demographics_${MOAB_JOBARRAYINDEX}
 sed -i "s/MUT_RATE/${MUTATION}/g" 1_Chunk_Slim_mod_demographics_${MOAB_JOBARRAYINDEX}
+sed -i "s/REC_RATE/${REC_RATE}/g" 1_Chunk_Slim_mod_demographics_${MOAB_JOBARRAYINDEX}
 sed -i "s/EXON_L/${EXON_SIZE}/g" 1_Chunk_Slim_mod_demographics_${MOAB_JOBARRAYINDEX}
 
 # Modify 1.5_Chunk to include new selection coefficient and pop_size and mutation rate
@@ -46,6 +44,7 @@ sed "s/selection_coef/${SEL_COEF}/g" $MASTER/scripts/1.5_Chunk_Spatial_Slim.txt 
 sed -i "s/pop_coef/${POP_N}/g" 1.5_Chunk_Slim_mod_demographics_${MOAB_JOBARRAYINDEX}
 sed -i "s/ID_coef/${MOAB_JOBARRAYINDEX}/g" 1.5_Chunk_Slim_mod_demographics_${MOAB_JOBARRAYINDEX}
 sed -i "s/MUT_RATE/${MUTATION}/g" 1.5_Chunk_Slim_mod_demographics_${MOAB_JOBARRAYINDEX}
+sed -i "s/REC_RATE/${REC_RATE}/g" 1.5_Chunk_Slim_mod_demographics_${MOAB_JOBARRAYINDEX}
 sed -i "s/EXON_L/${EXON_SIZE}/g" 1.5_Chunk_Slim_mod_demographics_${MOAB_JOBARRAYINDEX}
 
 # Modify 1_Chunk to include new selection coefficient and pop_size and mutation rate
@@ -53,6 +52,7 @@ sed "s/selection_coef/${SEL_COEF}/g" $MASTER/scripts/1_Chunk_Spatial_Slim_NullPh
 sed -i "s/pop_coef/${POP_N}/g" 1_Chunk_Slim_mod_NULL_${MOAB_JOBARRAYINDEX}
 sed -i "s/ID_coef/${MOAB_JOBARRAYINDEX}/g" 1_Chunk_Slim_mod_NULL_${MOAB_JOBARRAYINDEX}
 sed -i "s/MUT_RATE/${MUTATION}/g" 1_Chunk_Slim_mod_NULL_${MOAB_JOBARRAYINDEX}
+sed -i "s/REC_RATE/${REC_RATE}/g" 1_Chunk_Slim_mod_NULL_${MOAB_JOBARRAYINDEX}
 sed -i "s/EXON_L/${EXON_SIZE}/g" 1_Chunk_Slim_mod_NULL_${MOAB_JOBARRAYINDEX}
 
 # We also need to seed the dXY function with the number of sites
@@ -86,7 +86,7 @@ finalsize_array=(0.01 0.01 0.1 0.1 0.5 0.5 1.0 1.0 0.01 0.01 0.1 0.1 0.5 0.5 1.0
 migration_array=(0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002)
 
 # We also now iterate over genes, which starts here
-for iter in {1..20}
+for iter in {1..5}
 do
 
 #----------------------
@@ -153,4 +153,5 @@ sed -i '/^$/d' $MASTER/demographics_model/$OUT_DIR/GENE_${MOAB_JOBARRAYINDEX}_al
 # Kill the folder
 rm -rf $MASTER/demographics_model/sim_genes/${MOAB_JOBARRAYINDEX}
 rm -f $MASTER/scripts/logs/slim_master_run_isca.txt.*.${MOAB_JOBARRAYINDEX}
+
 
