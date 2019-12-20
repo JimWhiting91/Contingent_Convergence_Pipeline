@@ -6,10 +6,6 @@
 
 #---------------------------
 
-# Set environment
-module load GCC/8.1.0-2.30
-module load Perl/5.26.1-foss-2018a
-
 # Set up working directory
 MASTER=~/slim_dir
 
@@ -17,8 +13,9 @@ MASTER=~/slim_dir
 # Size of Pop and mutation rate
 POP_N=1000
 MUTATION="4.89e-6"
+REC_RATE="1e-6"
 MUT_EFFECT=1
-OUT_DIR="Neutral_mut-6"
+OUT_DIR="BASIC_OUTPUT_NEUTRAL"
 SLIM_LIBRARY=$MASTER/outputs/slim_genes
 
 # Make output folder if it does not already exist
@@ -37,6 +34,7 @@ sed "s/selection_coef/${SEL_COEF}/g" $MASTER/scripts/1_Chunk_Spatial_Slim_Neutra
 sed -i "s/pop_coef/${POP_N}/g" 1_Chunk_Slim_mod_demographics_${MOAB_JOBARRAYINDEX}
 sed -i "s/ID_coef/${MOAB_JOBARRAYINDEX}/g" 1_Chunk_Slim_mod_demographics_${MOAB_JOBARRAYINDEX}
 sed -i "s/MUT_RATE/${MUTATION}/g" 1_Chunk_Slim_mod_demographics_${MOAB_JOBARRAYINDEX}
+sed -i "s/REC_RATE/${REC_RATE}/g" 1_Chunk_Slim_mod_demographics_${MOAB_JOBARRAYINDEX}
 sed -i "s/EXON_L/${EXON_SIZE}/g" 1_Chunk_Slim_mod_demographics_${MOAB_JOBARRAYINDEX}
 
 # Modify 1.5_Chunk to include new selection coefficient and pop_size and mutation rate
@@ -44,6 +42,7 @@ sed "s/selection_coef/${SEL_COEF}/g" $MASTER/scripts/1.5_Chunk_Spatial_Slim_Neut
 sed -i "s/pop_coef/${POP_N}/g" 1.5_Chunk_Slim_mod_demographics_${MOAB_JOBARRAYINDEX}
 sed -i "s/ID_coef/${MOAB_JOBARRAYINDEX}/g" 1.5_Chunk_Slim_mod_demographics_${MOAB_JOBARRAYINDEX}
 sed -i "s/MUT_RATE/${MUTATION}/g" 1.5_Chunk_Slim_mod_demographics_${MOAB_JOBARRAYINDEX}
+sed -i "s/REC_RATE/${REC_RATE}/g" 1.5_Chunk_Slim_mod_demographics_${MOAB_JOBARRAYINDEX}
 sed -i "s/EXON_L/${EXON_SIZE}/g" 1.5_Chunk_Slim_mod_demographics_${MOAB_JOBARRAYINDEX}
 
 
@@ -105,7 +104,6 @@ rm -f 1_Chunk_Slim_mod_demographics_1_*
 
 
 done
-
 #----------------------
 
 # Can now use parallel to run each treatment over a CPU and output result
