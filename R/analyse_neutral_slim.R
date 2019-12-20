@@ -5,7 +5,7 @@
 ##########
 
 # Packages
-lib=c("ggedit","tidyr","dplyr","pbapply","randomForest","VennDiagram","ghibli","ggpubr","data.table","ggplot2","parallel","doParallel","effects","knitr","lme4","MASS","lmerTest","dplyr","rpart","randomForest","MuMIn")
+lib=c("ggedit","tidyr","dplyr","pbapply","randomForest","VennDiagram","ghibli","ggpubr","data.table","ggplot2","parallel","doParallel","effects","knitr","lme4","MASS","lmerTest","dplyr","rpart","randomForest")
 lapply(lib,library,character.only=T)
 
 # Source functions
@@ -17,17 +17,20 @@ source("R/Slim_General_Functions.R")
 pop_size<-1000
 
 # Run over mut rates
-data_files<-c("MutRate-6")
-neutral_files<-c("Neutral_mut-6")
+data_files<-c("Mut-6_Rec-6")
+neutral_files<-c("Neutral_Mut-6_Rec-6")
 
+# Which are we looking at?
+i<-1
+mut<--6
 
 # Make output/figs directories
-dir.create(file.path(paste0("outputs/",data_files,"_Neutral")))
-dir.create(file.path(paste0("figs/",data_files,"_Neutral")))
+dir.create(file.path(paste0("outputs/",data_files[i],"_Neutral_v2")))
+dir.create(file.path(paste0("figs/",data_files[i],"_Neutral_v2")))
 
 # Better
-fig_out<-paste0("figs/",data_files,"_Neutral")
-output_out<-paste0("outputs/",data_files,"_Neutral")
+fig_out<-paste0("figs/",data_files[i],"_Neutral_v2")
+output_out<-paste0("outputs/",data_files[i],"_Neutral_v2")
 
 # Read in all the data in the dir
 to_read<-list.files(paste0("data/",data_files))
@@ -815,7 +818,7 @@ plot_list<-lapply(1:length(treatment_vec),function(x){
     # Rbind
     tmp<-rbind(tmp1,tmp2,tmp3)
     
-    return(tmp)
+    return(tmp[,1:(ncol(tmp)-1)])
   })
   
   # Average over the list
@@ -917,8 +920,13 @@ iteration_list<-mclapply(1:100,function(iter){
     }
     colnames(FST_cov)<-treatments_to_keep
     FST_cor<-cor(FST_cov,method = "spearman")
-
-
+    # FST_p<-matrix(ncol=length(treatments_to_keep),nrow=length(treatments_to_keep))
+    # for(i in 1:ncol(comps_to_make)){
+    #   val1<-comps_to_make[1,i]
+    #   val2<-comps_to_make[2,i]
+    #   FST_p[val1,val2]<-cor.test(FST_cov[,val1],FST_cov[,val2],method="spearman")$p.value
+    # }
+    # 
     dXY_cov<-vector()
     for(i in 1:length(treatments_to_keep)) {
       tmp<-as.vector(slim_dd_GEN4[slim_dd_GEN4$Iteration == perm_iters[i] & slim_dd_GEN4$Treatment_Demo == treatments_to_keep[i],"dXY"])
@@ -982,7 +990,7 @@ lapply(1:length(generations_to_plot),function(gen_X){
 ##### False-positive rate across time
 # This is new for the revised manuscript, compares the distribution of True results to Null results across time and across treatments...
 library(ggridges)
-FPR_data<-rbind(slim_dd,slim_null,slim_neutral)
+FPR_data<-rbind(slim_neutral)
 
 # We will plot over the previously-used plotting generations
 FPR_analysis<-lapply(generations_to_plot,function(gen){
@@ -1022,7 +1030,42 @@ FPR_analysis<-lapply(generations_to_plot,function(gen){
                                                                  "Bot=1000/Pop2=0.5/Mig=0","Bot=1000/Pop2=1/Mig=0","Bot=1000/Pop2=0.5/Mig=0.002","Bot=1000/Pop2=1/Mig=0.002")
   )
   
-
+  # # Set the output
+  # pdf(paste0(fig_out,"/FPR_rates_for_all_distributions_generation_",gen,".pdf"),width=16,height=12)
+  # 
+  # # Plot the graphs in a loop
+  # for(m in 1:3){
+  #   
+  #   # Plot the ridges
+  #   g1<-ggplot(FPR_sub,aes(x=FPR_sub[,measures[m]],y=run_type,fill=run_type))+
+  #     stat_density_ridges(alpha=0.7,aes(fill=run_type))+
+  #     facet_wrap(~Treatment_Demo,scales = "free_x")+
+  #     scale_fill_manual(values = ghibli_palette("PonyoMedium")[c(3,4,6)])+
+  #     geom_vline(data=quantile_list,
+  #                aes(xintercept=as.numeric(as.character(quantile_list[,measures[m]])),
+  #                    linetype=run_type,colour=run_type),size=1)+
+  #     scale_y_discrete(limits=c("Neutral","Stabilising","Divergent"),
+  #                      labels = c('Divergent' = expression(Pheno[Div]),
+  #                                 'Stabilising'   = expression(Pheno[Null]),
+  #                                 'Neutral' = "Neutral"))+
+  #     theme_bw()+
+  #     theme(axis.text = element_text(size=18),
+  #           axis.title = element_text(size=20),
+  #           strip.text = element_text(size=16),
+  #           legend.text = element_text(size=16),
+  #           legend.title = element_text(size=18),
+  #           panel.grid = element_blank(),
+  #           legend.position = "none")+
+  #     ylab("Simulation Type")+
+  #     xlab(labs[m])+
+  #     labs(fill="Simulation Type",linetype="Simulation Type",colour="Simulation Type")+
+  #     scale_colour_manual(values=ghibli_palette("PonyoMedium")[c(3,4,6)])
+  #   
+  #   print(g1)
+  # }
+  # 
+  # dev.off()
+  # 
   # We are also interested in aspects of the distributions
   # What proportion of the divergent selected genes lie above the neutral 0.95 cut-off, ie. false-negative
   neutral_quantiles<-quantile_list[quantile_list$run_type=="Neutral",]
