@@ -145,7 +145,7 @@ initialize() {
 	m4.convertToSubstitution = F;
 	
 	// Recombination
-	initializeRecombinationRate(1e-8); // Homogeneous mutation rate
+	initializeRecombinationRate(REC_RATE); // Homogeneous mutation rate
 	
 	
 	// Genomic Elements are defined. Non-CDS have neutral m1, CDS have adaptive m2/m4 and deleterious m3
