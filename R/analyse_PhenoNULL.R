@@ -5,7 +5,7 @@
 ##########
 
 # Packages
-lib=c("ggedit","tidyr","dplyr","pbapply","randomForest","VennDiagram","ghibli","ggpubr","data.table","ggplot2","parallel","doParallel","effects","knitr","lme4","MASS","lmerTest","dplyr","rpart","randomForest","MuMIn")
+lib=c("MuMIn","ggedit","tidyr","dplyr","pbapply","randomForest","VennDiagram","ghibli","ggpubr","data.table","ggplot2","parallel","doParallel","effects","knitr","lme4","MASS","lmerTest","dplyr","rpart","randomForest")
 lapply(lib,library,character.only=T)
 
 # Source functions
@@ -17,16 +17,20 @@ source("R/Slim_General_Functions.R")
 pop_size<-1000
 
 # Run over mut rates
-data_files<-c("MutRate-6")
-neutral_files<-c("Neutral_mut-6")
+data_files<-c("Mut-6_Rec-6")
+neutral_files<-c("Neutral_Mut-6_Rec-6")
+
+# Which are we looking at?
+i<-1
+mut<--6
 
 # Make output/figs directories
-dir.create(file.path(paste0("outputs/",data_files,"_PHENOnull")))
-dir.create(file.path(paste0("figs/",data_files,"_PHENOnull")))
+dir.create(file.path(paste0("outputs/",data_files[i],"_PHENOnull_v2")))
+dir.create(file.path(paste0("figs/",data_files[i],"_PHENOnull_v2")))
 
 # Better
-fig_out<-paste0("figs/",data_files[i],"_PHENOnull")
-output_out<-paste0("outputs/",data_files[i],"_PHENOnull")
+fig_out<-paste0("figs/",data_files[i],"_PHENOnull_v2")
+output_out<-paste0("outputs/",data_files[i],"_PHENOnull_v2")
 
 # Read in all the data in the dir
 to_read<-list.files(paste0("data/",data_files))
@@ -814,7 +818,7 @@ plot_list<-lapply(1:length(treatment_vec),function(x){
     # Rbind
     tmp<-rbind(tmp1,tmp2,tmp3)
     
-    return(tmp)
+    return(tmp[,1:(ncol(tmp)-1)])
   })
   
   # Average over the list
@@ -916,8 +920,13 @@ iteration_list<-mclapply(1:100,function(iter){
     }
     colnames(FST_cov)<-treatments_to_keep
     FST_cor<-cor(FST_cov,method = "spearman")
- 
- 
+    # FST_p<-matrix(ncol=length(treatments_to_keep),nrow=length(treatments_to_keep))
+    # for(i in 1:ncol(comps_to_make)){
+    #   val1<-comps_to_make[1,i]
+    #   val2<-comps_to_make[2,i]
+    #   FST_p[val1,val2]<-cor.test(FST_cov[,val1],FST_cov[,val2],method="spearman")$p.value
+    # }
+    # 
     dXY_cov<-vector()
     for(i in 1:length(treatments_to_keep)) {
       tmp<-as.vector(slim_dd_GEN4[slim_dd_GEN4$Iteration == perm_iters[i] & slim_dd_GEN4$Treatment_Demo == treatments_to_keep[i],"dXY"])
@@ -981,14 +990,14 @@ lapply(1:length(generations_to_plot),function(gen_X){
 ##### False-positive rate across time
 # This is new for the revised manuscript, compares the distribution of True results to Null results across time and across treatments...
 library(ggridges)
-FPR_data<-rbind(slim_dd,slim_null,slim_neutral)
+FPR_data<-rbind(slim_dd,slim_neutral)
 
 # We will plot over the previously-used plotting generations
 FPR_analysis<-lapply(generations_to_plot,function(gen){
-  
+
   # Subset for generation
   FPR_sub<-FPR_data[FPR_data$Gen_N==gen,]
-  
+
   # For each treatment group, get the 0.95 quantile of each measure
   quantile_list<-data.frame(rbindlist(lapply(unique(FPR_sub$run_type),function(run){
     tmp<-FPR_sub[FPR_sub$run_type == run,]
@@ -999,13 +1008,13 @@ FPR_analysis<-lapply(generations_to_plot,function(gen){
       quantiles_to_plot[i,3]<-quantile(tmp[tmp$Treatment_Demo == quantiles_to_plot[i,1],"dXY"],0.95)
       quantiles_to_plot[i,4]<-quantile(tmp[tmp$Treatment_Demo == quantiles_to_plot[i,1],"deltaPI"],0.95)
     }
-    
+
     out<-as.data.frame(quantiles_to_plot)
     colnames(out)<-c("Treatment_Demo","FST","dXY","deltaPI")
     out$run_type<-run
     return(out)
   })))
-  
+
   # Change y-axes
   FPR_sub[FPR_sub$run_type=="Null","run_type"]<-"Divergent"
   quantile_list[quantile_list$run_type=="Null","run_type"]<-"Divergent"
@@ -1013,15 +1022,50 @@ FPR_analysis<-lapply(generations_to_plot,function(gen){
   # Plot for each measure
   measures<-c("FST","dXY","deltaPI")
   labs<-c(expression(F[ST]),expression(D[XY]),expression(Delta*pi))
-  
+
   # Change the order of treatments
   FPR_sub$Treatment_Demo<-factor(FPR_sub$Treatment_Demo,levels=c("Bot=100/Pop2=0.01/Mig=0","Bot=100/Pop2=0.1/Mig=0","Bot=100/Pop2=0.01/Mig=0.002","Bot=100/Pop2=0.1/Mig=0.002",
                                                                  "Bot=100/Pop2=0.5/Mig=0","Bot=100/Pop2=1/Mig=0","Bot=100/Pop2=0.5/Mig=0.002","Bot=100/Pop2=1/Mig=0.002",
                                                                  "Bot=1000/Pop2=0.01/Mig=0","Bot=1000/Pop2=0.1/Mig=0","Bot=1000/Pop2=0.01/Mig=0.002","Bot=1000/Pop2=0.1/Mig=0.002",
                                                                  "Bot=1000/Pop2=0.5/Mig=0","Bot=1000/Pop2=1/Mig=0","Bot=1000/Pop2=0.5/Mig=0.002","Bot=1000/Pop2=1/Mig=0.002")
   )
-  
-  
+
+  # # Set the output
+  # pdf(paste0(fig_out,"/FPR_rates_for_all_distributions_generation_",gen,".pdf"),width=16,height=12)
+  #
+  # # Plot the graphs in a loop
+  # for(m in 1:3){
+  #
+  #   # Plot the ridges
+  #   g1<-ggplot(FPR_sub,aes(x=FPR_sub[,measures[m]],y=run_type,fill=run_type))+
+  #     stat_density_ridges(alpha=0.7,aes(fill=run_type))+
+  #     facet_wrap(~Treatment_Demo,scales = "free_x")+
+  #     scale_fill_manual(values = ghibli_palette("PonyoMedium")[c(3,4,6)])+
+  #     geom_vline(data=quantile_list,
+  #                aes(xintercept=as.numeric(as.character(quantile_list[,measures[m]])),
+  #                    linetype=run_type,colour=run_type),size=1)+
+  #     scale_y_discrete(limits=c("Neutral","Stabilising","Divergent"),
+  #                      labels = c('Divergent' = expression(Pheno[Div]),
+  #                                 'Stabilising'   = expression(Pheno[Null]),
+  #                                 'Neutral' = "Neutral"))+
+  #     theme_bw()+
+  #     theme(axis.text = element_text(size=18),
+  #           axis.title = element_text(size=20),
+  #           strip.text = element_text(size=16),
+  #           legend.text = element_text(size=16),
+  #           legend.title = element_text(size=18),
+  #           panel.grid = element_blank(),
+  #           legend.position = "none")+
+  #     ylab("Simulation Type")+
+  #     xlab(labs[m])+
+  #     labs(fill="Simulation Type",linetype="Simulation Type",colour="Simulation Type")+
+  #     scale_colour_manual(values=ghibli_palette("PonyoMedium")[c(3,4,6)])
+  #
+  #   print(g1)
+  # }
+  #
+  # dev.off()
+  #
   # We are also interested in aspects of the distributions
   # What proportion of the divergent selected genes lie above the neutral 0.95 cut-off, ie. false-negative
   neutral_quantiles<-quantile_list[quantile_list$run_type=="Neutral",]
@@ -1035,9 +1079,9 @@ FPR_analysis<-lapply(generations_to_plot,function(gen){
                               FNR_deltaPI=sapply(1:nrow(neutral_quantiles),function(x){
                                 tmp<-FPR_sub[as.character(FPR_sub$Treatment_Demo) == as.character(neutral_quantiles$Treatment_Demo[x]) & FPR_sub$run_type=="Divergent",]
                                 return(nrow(tmp[tmp$deltaPI < as.numeric(as.character(neutral_quantiles$deltaPI[x])),])/nrow(tmp))}))
-  
+
   false_negatives$Generation<-gen
-  
+
   # What proportion of the upper 1% quantile are truly selected genes
   # We can permute this...
   FPR_perms<-mclapply(1:100,function(perm){
@@ -1275,6 +1319,65 @@ print(ggarrange(evolv_gen_list[[1]][[3]],
 dev.off()
 
 
+# ##### Generation Post Adaptation (GPA) #####
+# 
+# # Make a new dataset for modding
+# GPA_dd<-slim_dd
+# gens<-c(0.05*2*pop_size,
+#         0.158*2*pop_size,
+#         1.581*2*pop_size,
+#         5*2*pop_size)
+# 
+# # Fix generation to number
+# for(i in 1:4){
+#   GPA_dd[GPA_dd$Generation == paste0("Gen_",i),"Generation"]<-gens[i]
+# }
+# 
+# # Remove all incidences where phenotype was not reached
+# GPA_dd<-GPA_dd[GPA_dd$Evolv_Gen != 0,]
+# # Remove all incidences where measure was taken before phenotype was reached (+ 50 because of avg)
+# GPA_dd<-GPA_dd[GPA_dd$Evolv_Gen < (as.numeric(GPA_dd$Generation)+49),]
+# 
+# # Calculate GPA
+# GPA_dd$GPA<-as.numeric(GPA_dd$Generation)-GPA_dd$Evolv_Gen
+# 
+# # How does relationship over time vary demographically?
+# # Run over all treatments
+# plot_list<-lapply(1:length(treatment_vec),function(x){
+#   
+#   plot_dd<-data.frame(treatment=rep(GPA_dd[,treatment_vec[x]],3),
+#                       divergence=c(GPA_dd$FST,GPA_dd$dXY,GPA_dd$deltaPI),
+#                       selection=rep(GPA_dd$Selection_Coef,3),
+#                       GPA=rep(GPA_dd$GPA,3),
+#                       measure=rep(c("F[ST]","D[XY]","Delta*pi"),each=length(GPA_dd$FST)))
+#   
+#   plot_dd$selection<-as.factor(plot_dd$selection)
+#   plot_dd$treatment<-as.factor(plot_dd$treatment)
+#   plot_dd$measure2<-factor(plot_dd$measure,levels=c("F[ST]","D[XY]","Delta*pi"))
+#   
+#   g1<-ggplot(plot_dd,aes(x=GPA,y=divergence,colour=treatment))+
+#     geom_smooth(method="lm")+
+#     facet_grid(measure2~selection,labeller = label_parsed,scales = "free_y")+
+#     scale_colour_manual(values = rev(ghibli_palette("YesterdayMedium"))) +
+#     theme_bw()+
+#     theme(panel.grid = element_blank(),
+#           axis.title=element_text(size=20),
+#           axis.text.y=element_text(size=16),
+#           axis.text.x=element_text(size=16,angle=45,hjust=1),
+#           strip.text = element_text(size=20),
+#           legend.text = element_text(size=14),
+#           legend.title = element_text(size=15))+
+#     labs(y="Divergence",x="Generations Post Adaptation",colour="Treatment")
+#   
+#   return(g1)
+# })
+# 
+# pdf(paste0(fig_out,"/GPA_figures.pdf"),width=16,height=10)
+# print(plot_list[[1]])
+# print(plot_list[[2]])
+# print(plot_list[[3]])
+# dev.off()
+
 ##### What explains measures? #####
 
 ###########################################################################
@@ -1289,7 +1392,7 @@ lmm1<-lmer(FST~Selection_Coef+log(exon_N)+log(Target_sel)+log(gene_length)+(1|Ge
                                                                                                                                         slim_dd_GEN4$Evolv_Gen > 0,])
 drop1(lmm1)
 model.step1<-step(lmm1,scope=~.^2,direction="both")
-lmm_fixed<-lmer(FST ~ Selection_Coef + log(Target_sel) + log(Evolv_Gen) + (1 | Gene_ID) + (1 | Treatment_Demo),slim_dd_GEN4[slim_dd_GEN4$Migration == 0.002&
+lmm_fixed<-lmer(FST ~ Selection_Coef + log(Target_sel) + (1 | Gene_ID) + (1 | Treatment_Demo),slim_dd_GEN4[slim_dd_GEN4$Migration == 0.002&
                                                                                                                                            slim_dd_GEN4$Evolv_Gen > 0,])
 # Evaluate
 drop1(lmm_fixed)
@@ -1360,7 +1463,7 @@ lmm3<-lmer(dXY~Selection_Coef+log(exon_N)+log(Target_sel)+log(gene_length)+(1|Ge
 
 drop1(lmm3)
 model.step3<-step(lmm3,scope=~.^2,direction="both")
-lmm3_fixed<-lmer(dXY ~ Selection_Coef + log(Target_sel) + log(Evolv_Gen) + (1 | Gene_ID) + (1 | Treatment_Demo),slim_dd_GEN4[slim_dd_GEN4$Migration == 0.002 &
+lmm3_fixed<-lmer(dXY ~ Selection_Coef + log(Target_sel) + log(exon_N) + (1 | Gene_ID) + (1 | Treatment_Demo),slim_dd_GEN4[slim_dd_GEN4$Migration == 0.002 &
                                                                                                                                slim_dd_GEN4$Evolv_Gen > 0,])
 # Evaluate
 drop1(lmm3_fixed)
@@ -1426,7 +1529,7 @@ lmm5<-lmer(deltaPI~Selection_Coef+log(exon_N)+log(Target_sel)+log(gene_length)+(
 
 drop1(lmm5)
 model.step5<-step(lmm5,scope=~.^2,direction="both")
-lmm5_fixed<-lmer(deltaPI ~ Selection_Coef + log(gene_length) + (1 | Gene_ID) + (1 | Treatment_Demo),slim_dd_GEN4[slim_dd_GEN4$Migration == 0.002 & slim_dd_GEN4$Evolv_Gen > 0,])
+lmm5_fixed<-lmer(deltaPI ~ Selection_Coef + log(exon_N) + (1 | Gene_ID) + (1 | Treatment_Demo),slim_dd_GEN4[slim_dd_GEN4$Migration == 0.002 & slim_dd_GEN4$Evolv_Gen > 0,])
 
 # Evaluate
 drop1(lmm5_fixed)
