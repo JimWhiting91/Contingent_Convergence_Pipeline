@@ -23,16 +23,27 @@ source("R/Slim_General_Functions.R")
 pop_size<-1000
 
 # Run over mut rates
-data_files<-c("MutRate-6")
-neutral_files<-c("Neutral_mut-6")
+data_files_list<-c("Mut-6_Rec-6")
+
+neutral_files_list<-c("Neutral_Mut-6_Rec-6")
+
+# Which are we looking at?
+i<-1
+
+# How many iterations in the data?
+iter_N<-20
+
+# Set paths
+neutral_files<-neutral_files_list[i]
+data_files<-data_files_list[i]
 
 # Make output/figs directories
-dir.create(file.path(paste0("outputs/",data_files)))
-dir.create(file.path(paste0("figs/",data_files)))
+dir.create(file.path(paste0("outputs/",data_files,"_v2")))
+dir.create(file.path(paste0("figs/",data_files,"_v2")))
 
 # Better
-fig_out<-paste0("figs/",data_files)
-output_out<-paste0("outputs/",data_files)
+fig_out<-paste0("figs/",data_files,"_v2")
+output_out<-paste0("outputs/",data_files,"_v2")
 
 # Read in all the data in the dir
 to_read<-list.files(paste0("data/",data_files))
@@ -117,6 +128,48 @@ for (i in 1:length(cor_dd$Treatment)){
   cor_dd$Pop2[i]<-mean(slim_dd[slim_dd$Iteration==1 & slim_dd$Treatment_Demo == levels(slim_dd$Treatment_Demo)[i],"Pop2_Size"])
 }
 
+#   # Correlations within generation
+#   for (j in 1:12){
+#     
+#     # Between measures
+#     cor_dd$FST.dXY[i]<-cor(as.numeric(as.character(slim_dd[slim_dd$Treatment_Demo == levels(slim_dd$Treatment_Demo)[i] & slim_dd$Generation == paste0("Gen_",j),"FST"])),
+#                            as.numeric(as.character(slim_dd[slim_dd$Treatment_Demo == levels(slim_dd$Treatment_Demo)[i] & slim_dd$Generation == paste0("Gen_",j),"dXY"])),method = c("pearson"))
+#     cor_dd$FST.delPI[i]<-cor(as.numeric(as.character(slim_dd[slim_dd$Treatment_Demo == levels(slim_dd$Treatment_Demo)[i] & slim_dd$Generation == paste0("Gen_",j),"FST"])),
+#                              as.numeric(as.character(slim_dd[slim_dd$Treatment_Demo == levels(slim_dd$Treatment_Demo)[i] & slim_dd$Generation == paste0("Gen_",j),"deltaPI"])),method = c("pearson"))
+#     cor_dd$dXY.delPI[i]<-cor(as.numeric(as.character(slim_dd[slim_dd$Treatment_Demo == levels(slim_dd$Treatment_Demo)[i] & slim_dd$Generation == paste0("Gen_",j),"dXY"])),
+#                              as.numeric(as.character(slim_dd[slim_dd$Treatment_Demo == levels(slim_dd$Treatment_Demo)[i] & slim_dd$Generation == paste0("Gen_",j),"deltaPI"])),method = c("pearson"))
+#     
+#     # With Selection
+#     cor_dd$FST.SEL[i]<-cor(as.numeric(as.character(slim_dd[slim_dd$Treatment_Demo == levels(slim_dd$Treatment_Demo)[i] & slim_dd$Generation == paste0("Gen_",j),"FST"])),
+#                            as.numeric(as.character(slim_dd[slim_dd$Treatment_Demo == levels(slim_dd$Treatment_Demo)[i] & slim_dd$Generation == paste0("Gen_",j),"Selection_Coef"])),method = c("pearson"))
+#     cor_dd$dXY.SEL[i]<-cor(as.numeric(as.character(slim_dd[slim_dd$Treatment_Demo == levels(slim_dd$Treatment_Demo)[i] & slim_dd$Generation == paste0("Gen_",j),"dXY"])),
+#                            as.numeric(as.character(slim_dd[slim_dd$Treatment_Demo == levels(slim_dd$Treatment_Demo)[i] & slim_dd$Generation == paste0("Gen_",j),"Selection_Coef"])),method = c("pearson"))
+#     cor_dd$delPI.SEL[i]<-cor(as.numeric(as.character(slim_dd[slim_dd$Treatment_Demo == levels(slim_dd$Treatment_Demo)[i] & slim_dd$Generation == paste0("Gen_",j),"deltaPI"])),
+#                              as.numeric(as.character(slim_dd[slim_dd$Treatment_Demo == levels(slim_dd$Treatment_Demo)[i] & slim_dd$Generation == paste0("Gen_",j),"Selection_Coef"])),method = c("pearson"))
+#     
+#     # With founder pi
+#     cor_dd$FST.SEL[i]<-cor(as.numeric(as.character(slim_dd[slim_dd$Treatment_Demo == levels(slim_dd$Treatment_Demo)[i] & slim_dd$Generation == paste0("Gen_",j),"FST"])),
+#                            as.numeric(as.character(slim_dd[slim_dd$Treatment_Demo == levels(slim_dd$Treatment_Demo)[i] & slim_dd$Generation == "Gen_1","Pop1_PI"])),method = c("pearson"))
+#     cor_dd$dXY.SEL[i]<-cor(as.numeric(as.character(slim_dd[slim_dd$Treatment_Demo == levels(slim_dd$Treatment_Demo)[i] & slim_dd$Generation == paste0("Gen_",j),"dXY"])),
+#                            as.numeric(as.character(slim_dd[slim_dd$Treatment_Demo == levels(slim_dd$Treatment_Demo)[i] & slim_dd$Generation == "Gen_1","Pop1_PI"])),method = c("pearson"))
+#     cor_dd$delPI.SEL[i]<-cor(as.numeric(as.character(slim_dd[slim_dd$Treatment_Demo == levels(slim_dd$Treatment_Demo)[i] & slim_dd$Generation == paste0("Gen_",j),"deltaPI"])),
+#                              as.numeric(as.character(slim_dd[slim_dd$Treatment_Demo == levels(slim_dd$Treatment_Demo)[i] & slim_dd$Generation == "Gen_1","Pop1_PI"])),method = c("pearson"))
+#     
+#     cor_dd_list[[j]]<-cor_dd
+#     
+#   }
+#   
+#   # Correlations across all generations
+#   cor_dd$FST.dXY[i]<-cor(as.numeric(as.character(slim_dd[slim_dd$Treatment_Demo == levels(slim_dd$Treatment_Demo)[i],"FST"])),
+#                          as.numeric(as.character(slim_dd[slim_dd$Treatment_Demo == levels(slim_dd$Treatment_Demo)[i],"dXY"])),method = c("pearson"))
+#   cor_dd$FST.SEL[i]<-cor(as.numeric(as.character(slim_dd[slim_dd$Treatment_Demo == levels(slim_dd$Treatment_Demo)[i],"FST"])),
+#                          as.numeric(as.character(slim_dd[slim_dd$Treatment_Demo == levels(slim_dd$Treatment_Demo)[i],"Selection_Coef"])),method = c("pearson"))
+#   cor_dd$dXY.SEL[i]<-cor(as.numeric(as.character(slim_dd[slim_dd$Treatment_Demo == levels(slim_dd$Treatment_Demo)[i],"dXY"])),
+#                          as.numeric(as.character(slim_dd[slim_dd$Treatment_Demo == levels(slim_dd$Treatment_Demo)[i],"Selection_Coef"])),method = c("pearson"))
+#   cor_dd_list[[5]]<-cor_dd
+#   
+# }
+
 #-------------------------------------------
 # EFFECT OF TREATMENTS ON MEASURES
 #-------------------------------------------
@@ -130,7 +183,7 @@ plot_list<-lapply(1:length(treatment_vec),function(x){
   ###################################################################################
   # This gets run over each iteration and averaged over
   
-  iteration_list<-lapply(1:20,function(iter){
+  iteration_list<-lapply(1:iter_N,function(iter){
     # Edit the data such that Fst and dXY are same column with identifier column
     # Summarise
     tmp1<-cbind(slim_dd[slim_dd$Iteration==iter,c("Gen_N","FST",treatment_vec[x],"Treatment_Demo")],Measure=rep("FST"))
@@ -254,7 +307,7 @@ plot_list<-lapply(1:length(treatment_vec),function(x){
   ###################################################################################
   # This gets run over each iteration separately and averaged over
   
-  iteration_list<-lapply(1:20,function(iter){
+  iteration_list<-lapply(1:iter_N,function(iter){
     
     # Edit the data such that Fst.sel and dXY.sel and delPI.sel are same column with identifier column
     # Summarise FST
@@ -395,7 +448,7 @@ write.table(plot_list[[3]][[2]],
 ###################################################################################
 # This gets run over each iteration separately and averaged over
 
-iteration_list<-lapply(1:20,function(iter){
+iteration_list<-lapply(1:iter_N,function(iter){
   
   cor_dd2<-cbind(slim_dd[slim_dd$Iteration==iter,c("Treatment_Demo","Gen_N","FST","Selection_Coef","dXY","deltaPI")])
   cor_dd2<-as.data.frame(cor_dd2 %>% 
@@ -473,7 +526,7 @@ plot_list<-lapply(1:length(treatment_vec),function(x){
   ###################################################################################
   # This gets run over each iteration separately and averaged over
   
-  iteration_list<-lapply(1:20,function(iter){
+  iteration_list<-lapply(1:iter_N,function(iter){
     
     # Edit the data such that Fst.sel and dXY.sel and delPI.sel are same column with identifier column
     # Summarise FST
@@ -618,7 +671,7 @@ plot_list<-lapply(1:length(treatment_vec),function(x){
   ###################################################################################
   # This gets run over each iteration separately and averaged over
   
-  iteration_list<-lapply(1:20,function(iter){
+  iteration_list<-lapply(1:iter_N,function(iter){
     
     # Edit the data such that Fst.sel and dXY.sel and delPI.sel are same column with identifier column
     # Summarise FST
@@ -756,7 +809,7 @@ plot_list<-lapply(1:length(treatment_vec),function(x){
   ###################################################################################
   # This gets run over each iteration separately and averaged over
   
-  iteration_list<-lapply(1:20,function(iter){
+  iteration_list<-lapply(1:iter_N,function(iter){
     
     
     # Edit the data such that Fst.sel and dXY.sel and delPI.sel are same column with identifier column
@@ -900,7 +953,7 @@ generations_to_plot<-c(100,500,3000,10000)
 iteration_list<-mclapply(1:100,function(iter){
   
   # Draw the permutation iterations
-  perm_iters<-sample(1:20,16)
+  perm_iters<-sample(1:iter_N,16)
   
   comps_to_make<-combn(1:16,2)
   
@@ -923,7 +976,13 @@ iteration_list<-mclapply(1:100,function(iter){
     }
     colnames(FST_cov)<-treatments_to_keep
     FST_cor<-cor(FST_cov,method = "spearman")
-
+    # FST_p<-matrix(ncol=length(treatments_to_keep),nrow=length(treatments_to_keep))
+    # for(i in 1:ncol(comps_to_make)){
+    #   val1<-comps_to_make[1,i]
+    #   val2<-comps_to_make[2,i]
+    #   FST_p[val1,val2]<-cor.test(FST_cov[,val1],FST_cov[,val2],method="spearman")$p.value
+    # }
+    # 
     dXY_cov<-vector()
     for(i in 1:length(treatments_to_keep)) {
       tmp<-as.vector(slim_dd_GEN4[slim_dd_GEN4$Iteration == perm_iters[i] & slim_dd_GEN4$Treatment_Demo == treatments_to_keep[i],"dXY"])
@@ -1086,7 +1145,7 @@ FPR_analysis<-lapply(generations_to_plot,function(gen){
   FPR_perms<-mclapply(1:100,function(perm){
     set.seed(perm)
     
-    downsampled_divergents<-sample(1:20,100,replace=T)
+    downsampled_divergents<-sample(1:iter_N,100,replace=T)
     
     # Run separately for each treatment group
     treats<-lapply(1:nrow(neutral_quantiles),function(y){
@@ -1098,7 +1157,7 @@ FPR_analysis<-lapply(generations_to_plot,function(gen){
       neutral_tmp<-FPR_sub[as.character(FPR_sub$Treatment_Demo) == as.character(neutral_quantiles$Treatment_Demo[y]) & 
                              FPR_sub$run_type=="Neutral",]
       neutral_tmp$index<-paste0(neutral_tmp$Gene_ID,"-",neutral_tmp$Iteration,"-",neutral_tmp$run_type)
-      neutral_tmp<-neutral_tmp[neutral_tmp$Iteration != sample(1:20,1),]
+      neutral_tmp<-neutral_tmp[neutral_tmp$Iteration != sample(1:iter_N,1),]
       divergent_tmp<-FPR_sub[as.character(FPR_sub$Treatment_Demo) == as.character(neutral_quantiles$Treatment_Demo[y]) & FPR_sub$run_type=="Divergent",]
       
       # Get the right iteration for each gene
@@ -1318,6 +1377,67 @@ print(ggarrange(evolv_gen_list[[1]][[3]],
 dev.off()
 
 
+# ##### Generation Post Adaptation (GPA) #####
+# 
+# # Make a new dataset for modding
+# GPA_dd<-slim_dd
+# gens<-c(0.05*2*pop_size,
+#         0.158*2*pop_size,
+#         1.581*2*pop_size,
+#         5*2*pop_size)
+# 
+# # Fix generation to number
+# for(i in 1:4){
+#   GPA_dd[GPA_dd$Generation == paste0("Gen_",i),"Generation"]<-gens[i]
+# }
+# 
+# # Remove all incidences where phenotype was not reached
+# GPA_dd<-GPA_dd[GPA_dd$Evolv_Gen != 0,]
+# # Remove all incidences where measure was taken before phenotype was reached (+ 50 because of avg)
+# GPA_dd<-GPA_dd[GPA_dd$Evolv_Gen < (as.numeric(GPA_dd$Generation)+49),]
+# 
+# # Calculate GPA
+# GPA_dd$GPA<-as.numeric(GPA_dd$Generation)-GPA_dd$Evolv_Gen
+# 
+# # How does relationship over time vary demographically?
+# # Run over all treatments
+# plot_list<-lapply(1:length(treatment_vec),function(x){
+#   
+#   plot_dd<-data.frame(treatment=rep(GPA_dd[,treatment_vec[x]],3),
+#                       divergence=c(GPA_dd$FST,GPA_dd$dXY,GPA_dd$deltaPI),
+#                       selection=rep(GPA_dd$Selection_Coef,3),
+#                       GPA=rep(GPA_dd$GPA,3),
+#                       measure=rep(c("F[ST]","D[XY]","Delta*pi"),each=length(GPA_dd$FST)))
+#   
+#   plot_dd$selection<-as.factor(plot_dd$selection)
+#   plot_dd$treatment<-as.factor(plot_dd$treatment)
+#   plot_dd$measure2<-factor(plot_dd$measure,levels=c("F[ST]","D[XY]","Delta*pi"))
+#   
+#   g1<-ggplot(plot_dd,aes(x=GPA,y=divergence,colour=treatment))+
+#     geom_smooth(method="lm")+
+#     facet_grid(measure2~selection,labeller = label_parsed,scales = "free_y")+
+#     scale_colour_manual(values = rev(ghibli_palette("YesterdayMedium"))) +
+#     theme_bw()+
+#     theme(panel.grid = element_blank(),
+#           axis.title=element_text(size=20),
+#           axis.text.y=element_text(size=16),
+#           axis.text.x=element_text(size=16,angle=45,hjust=1),
+#           strip.text = element_text(size=20),
+#           legend.text = element_text(size=14),
+#           legend.title = element_text(size=15))+
+#     labs(y="Divergence",x="Generations Post Adaptation",colour="Treatment")
+#   
+#   return(g1)
+# })
+# 
+# pdf(paste0(fig_out,"/GPA_figures.pdf"),width=16,height=10)
+# print(plot_list[[1]])
+# print(plot_list[[2]])
+# print(plot_list[[3]])
+# dev.off()
+
+##### What explains measures? #####
+
 ###########################################################################
 # Explain FST at final stage
 
@@ -1361,7 +1481,7 @@ lmm2<-lmer(FST~Selection_Coef+log(exon_N)+log(Target_sel)+log(gene_length)+log(E
                                                                                                                                         slim_dd_GEN4$Evolv_Gen > 0,])
 drop1(lmm2)
 model.step2<-step(lmm2,scope=~.^2,direction="both")
-lmm2_fixed<-lmer(FST ~ Selection_Coef + log(Target_sel) + (1 | Gene_ID) + (1 | Treatment_Demo),slim_dd_GEN4[slim_dd_GEN4$Migration == 0 &
+lmm2_fixed<-lmer(FST ~ Selection_Coef + log(exon_N) + log(Target_sel) + log(Evolv_Gen) + (1 | Gene_ID) + (1 | Treatment_Demo),slim_dd_GEN4[slim_dd_GEN4$Migration == 0 &
                                                                                                               slim_dd_GEN4$Evolv_Gen > 0,])
 # Evaluate
 drop1(lmm2_fixed)
@@ -1402,9 +1522,8 @@ lmm3<-lmer(dXY~Selection_Coef+log(exon_N)+log(Target_sel)+log(gene_length)+log(E
 
 drop1(lmm3)
 model.step3<-step(lmm3,scope=~.^2,direction="both")
-lmm3_fixed<-lmer(dXY ~ Selection_Coef + log(Target_sel) + log(Evolv_Gen) + (1 | Gene_ID) + (1 | Treatment_Demo),slim_dd_GEN4[slim_dd_GEN4$Migration == 0.002 &
+lmm3_fixed<-lmer(dXY ~ Selection_Coef + log(exon_N) + log(Evolv_Gen) + (1 | Gene_ID) + (1 | Treatment_Demo),slim_dd_GEN4[slim_dd_GEN4$Migration == 0.002 &
                                                                                                                                slim_dd_GEN4$Evolv_Gen > 0,])
-
 # Evaluate
 drop1(lmm3_fixed)
 
@@ -1416,11 +1535,11 @@ r.squaredGLMM(lmm3_fixed)
 
 ######################################################
 # DXY now for treatments WITHOUT migration
-lmm4<-lmer(dXY~Selection_Coef+log(exon_N)+log(Target_sel)+log(gene_length)+log(Evolv_Gen)+(1|Gene_ID/Iteration)+(1|Treatment_Demo),slim_dd_GEN4[slim_dd_GEN4$Migration == 0 &
+lmm4<-lmer(dXY~Selection_Coef+log(exon_N)+log(Target_sel)+log(gene_length)+log(Evolv_Gen)+(1|Gene_ID)+(1|Treatment_Demo),slim_dd_GEN4[slim_dd_GEN4$Migration == 0 &
                                                                                                                                                   slim_dd_GEN4$Evolv_Gen > 0,])
 drop1(lmm4)
 model.step4<-step(lmm4,scope=~.^2,direction="both")
-lmm4_fixed<-lmer(dXY ~ log(Target_sel)+log(Evolv_Gen) + (1 | Gene_ID) + (1 | Treatment_Demo),slim_dd_GEN4[slim_dd_GEN4$Migration == 0 &
+lmm4_fixed<-lmer(dXY ~ log(Target_sel) + (1 | Gene_ID) + (1 | Treatment_Demo),slim_dd_GEN4[slim_dd_GEN4$Migration == 0 &
                                                                                                             slim_dd_GEN4$Evolv_Gen > 0,])
 # Evaluate
 drop1(lmm4_fixed)
@@ -1468,7 +1587,7 @@ lmm5<-lmer(deltaPI~Selection_Coef+log(exon_N)+log(Target_sel)+log(gene_length)+l
 
 drop1(lmm5)
 model.step5<-step(lmm5,scope=~.^2,direction="both")
-lmm5_fixed<-lmer(deltaPI ~ Selection_Coef + (1 | Gene_ID) + (1 | Treatment_Demo),slim_dd_GEN4[slim_dd_GEN4$Migration == 0.002 & slim_dd_GEN4$Evolv_Gen > 0,])
+lmm5_fixed<-lmer(deltaPI ~ Selection_Coef + log(Target_sel)+ log(Evolv_Gen) + (1 | Gene_ID) + (1 | Treatment_Demo),slim_dd_GEN4[slim_dd_GEN4$Migration == 0.002 & slim_dd_GEN4$Evolv_Gen > 0,])
 
 # Evaluate
 drop1(lmm5_fixed)
@@ -1485,7 +1604,7 @@ lmm6<-lmer(deltaPI~Selection_Coef+log(exon_N)+log(Target_sel)+log(gene_length)+l
                                                                                                                                             slim_dd_GEN4$Evolv_Gen > 0,])
 drop1(lmm6)
 model.step6<-step(lmm6,scope=~.^2,direction="both")
-lmm6_fixed<-lmer(deltaPI ~ Selection_Coef + log(Evolv_Gen) + (1 | Gene_ID) + (1 | Treatment_Demo),slim_dd_GEN4[slim_dd_GEN4$Migration == 0 &
+lmm6_fixed<-lmer(deltaPI ~ Selection_Coef +log(exon_N) + log(Evolv_Gen) + (1 | Gene_ID) + (1 | Treatment_Demo),slim_dd_GEN4[slim_dd_GEN4$Migration == 0 &
                                                                                                                  slim_dd_GEN4$Evolv_Gen > 0,])
 # Evaluate
 drop1(lmm6_fixed)
