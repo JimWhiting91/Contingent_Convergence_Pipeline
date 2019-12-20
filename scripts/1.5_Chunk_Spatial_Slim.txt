@@ -1,11 +1,7 @@
 initialize() {
 	// Constants are defined externally by a separate script
 	defineConstant("pop_size",pop_coef);
-	//defineConstant("mig_rate",migration_coef);
-	//defineConstant("bottleneck_prop", bottleneck_coef);
-	//defineConstant("finalsize_prop",finalsize_coef);
 	defineConstant("gene_id", ID_coef);
-	//defineConstant("run_id", run_coef);
 	defineConstant("optimum1", 0.0);
 	defineConstant("optimum2", 10.0);
 	defineConstant("sigma_C", 0.4);
@@ -17,13 +13,13 @@ initialize() {
 	initializeSLiMOptions(dimensionality="x");
 	initializeMutationRate(MUT_RATE);
 	
-	// 4 Different mutation types are defined: Neutral, General Deleterious, General Advantageous, Divergent Advantageous
+	// 2 Different mutation types are defined: Neutral, QTL
 	initializeMutationType("m1", 0.5, "f", 0.0); // Neutral mutation
 	initializeMutationType("m4", 0.5, "n", 0.0, effect_size); // QTL SNPs
 	m4.convertToSubstitution = F;
 	
 	// Recombination
-	initializeRecombinationRate(1e-8); // Homogeneous mutation rate
+	initializeRecombinationRate(REC_RATE); // Homogeneous mutation rate
 	
 	
 	// Genomic Elements are defined. Non-CDS have neutral m1, CDS have adaptive m2/m4 and deleterious m3
